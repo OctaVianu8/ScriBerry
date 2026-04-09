@@ -1,0 +1,29 @@
+name = "scriberry-worker"
+main = "worker/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "scriberry-db"
+database_id = "PLACEHOLDER_D1_DATABASE_ID"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "scriberry-media"
+
+[triggers]
+crons = ["0 18 * * *"]
+
+[vars]
+ENVIRONMENT = "production"
+# Public OAuth config — set your actual values here
+APP_URL = "https://scriberry.pages.dev"
+GOOGLE_CLIENT_ID = "PLACEHOLDER_GOOGLE_CLIENT_ID"
+APPLE_CLIENT_ID = "PLACEHOLDER_APPLE_SERVICE_ID"   # e.g. com.yourname.scriberry
+APPLE_TEAM_ID = "PLACEHOLDER_APPLE_TEAM_ID"
+APPLE_KEY_ID = "PLACEHOLDER_APPLE_KEY_ID"
+
+# Secrets — set with: wrangler secret put <NAME>
+# GOOGLE_CLIENT_SECRET
+# APPLE_PRIVATE_KEY   (full contents of the .p8 file, including header/footer)

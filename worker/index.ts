@@ -1,0 +1,56 @@
+import { handleAuth, getAuthenticatedUserId } from './modules/auth'
+import { handleJournal } from './modules/journal'
+import { handleGym } from './modules/gym'
+import { handleReading } from './modules/reading'
+import { handleMedia } from './modules/media'
+import { handlePush } from './modules/push'
+import { handleSettings } from './modules/settings'
+import { sendScheduledNotifications } from './cron/notifications'
+
+export interface Env {
+  DB: D1Database
+  BUCKET: R2Bucket
+  ENVIRONMENT: string
+  APP_URL: string
+  GOOGLE_CLIENT_ID: string
+  GOOGLE_CLIENT_SECRET: string
+  APPLE_CLIENT_ID: string
+  APPLE_TEAM_ID: string
+  APPLE_KEY_ID: string
+  APPLE_PRIVATE_KEY: string
+}
+
+const JSON_401 = new Response(JSON.stringify({ error: 'Unauthorized' }), {
+  status: 401,
+  headers: { 'Content-Type': 'application/json' },
+})
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    const { pathname } = new URL(request.url)
+
+    // /api/auth/* is public — OAuth flows and session endpoints
+    if (pathname.startsWith('/api/auth')) return handleAuth(request, env)
+
+    // All other /api/* routes require a valid session
+    if (pathname.startsWith('/api/')) {
+      const userId = await getAuthenticatedUserId(request, env)
+      if (!userId) return JSON_401.clone()
+
+      if (pathname.startsWith('/api/journal')) return handleJournal(request, env, userId)
+      if (pathname.startsWith('/api/gym')) return handleGym(request, env, userId)
+      if (pathname.startsWith('/api/reading')) return handleReading(request, env, userId)
+      if (pathname.startsWith('/api/media')) return handleMedia(request, env, userId)
+      if (pathname.startsWith('/api/push')) return handlePush(request, env, userId)
+      if (pathname.startsWith('/api/settings')) return handleSettings(request, env, userId)
+
+      return new Response('Not found', { status: 404 })
+    }
+
+    return new Response('Not found', { status: 404 })
+  },
+
+  async scheduled(_event: ScheduledEvent, env: Env): Promise<void> {
+    await sendScheduledNotifications(env)
+  },
+}
