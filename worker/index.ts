@@ -8,8 +8,13 @@ import { handleSettings } from './modules/settings'
 import { sendScheduledNotifications } from './cron/notifications'
 
 export interface Env {
-  DB: D1Database
-  BUCKET: R2Bucket
+  // Bindings — names must match wrangler.toml exactly
+  scriberry_db: D1Database
+  scriberry_media: R2Bucket
+  // Pages assets binding — automatically provided by Cloudflare Pages
+  ASSETS: Fetcher
+
+  // Vars / secrets
   ENVIRONMENT: string
   APP_URL: string
   GOOGLE_CLIENT_ID: string
@@ -20,10 +25,11 @@ export interface Env {
   APPLE_PRIVATE_KEY: string
 }
 
-const json401 = () => new Response(JSON.stringify({ error: 'Unauthorized' }), {
-  status: 401,
-  headers: { 'Content-Type': 'application/json' },
-})
+const json401 = () =>
+  new Response(JSON.stringify({ error: 'Unauthorized' }), {
+    status: 401,
+    headers: { 'Content-Type': 'application/json' },
+  })
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -47,7 +53,8 @@ export default {
       return new Response('Not found', { status: 404 })
     }
 
-    return new Response('Not found', { status: 404 })
+    // All non-API requests are served from the Pages static asset build
+    return env.ASSETS.fetch(request)
   },
 
   async scheduled(_event: ScheduledEvent, env: Env): Promise<void> {

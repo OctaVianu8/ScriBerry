@@ -98,13 +98,13 @@ async function createUserSession(
   avatarUrl: string,
 ): Promise<string> {
   const newId = crypto.randomUUID()
-  await upsertUserByEmail(env.DB, newId, email, name, avatarUrl)
-  const user = await getUserByEmail(env.DB, email)
+  await upsertUserByEmail(env.scriberry_db, newId, email, name, avatarUrl)
+  const user = await getUserByEmail(env.scriberry_db, email)
   if (!user) throw new Error('Failed to create or find user')
 
   const sessionId = crypto.randomUUID()
   const expiresAt = toSQLiteDate(new Date(Date.now() + SESSION_DAYS * 86400 * 1000))
-  await createSession(env.DB, sessionId, user.id, expiresAt)
+  await createSession(env.scriberry_db, sessionId, user.id, expiresAt)
   return sessionId
 }
 
@@ -395,7 +395,7 @@ export async function getAuthenticatedUserId(
   const cookies = parseCookies(request.headers.get('Cookie') ?? '')
   const sessionId = cookies[SESSION_COOKIE]
   if (!sessionId) return null
-  const session = await getSessionById(env.DB, sessionId)
+  const session = await getSessionById(env.scriberry_db, sessionId)
   return session?.user_id ?? null
 }
 
@@ -409,9 +409,9 @@ export async function getAuthenticatedUser(
   const cookies = parseCookies(request.headers.get('Cookie') ?? '')
   const sessionId = cookies[SESSION_COOKIE]
   if (!sessionId) return null
-  const session = await getSessionById(env.DB, sessionId)
+  const session = await getSessionById(env.scriberry_db, sessionId)
   if (!session) return null
-  return getUserById(env.DB, session.user_id)
+  return getUserById(env.scriberry_db, session.user_id)
 }
 
 // ---------------------------------------------------------------------------
@@ -458,7 +458,7 @@ export async function handleAuth(request: Request, env: Env): Promise<Response> 
     const isSecure = new URL(request.url).protocol === 'https:'
     const cookies = parseCookies(request.headers.get('Cookie') ?? '')
     const sessionId = cookies[SESSION_COOKIE]
-    if (sessionId) await deleteSession(env.DB, sessionId)
+    if (sessionId) await deleteSession(env.scriberry_db, sessionId)
 
     return new Response(JSON.stringify({ ok: true }), {
       headers: {
