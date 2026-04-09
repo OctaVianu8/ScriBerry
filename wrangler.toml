@@ -9,7 +9,7 @@ database_name = "scriberry-db"
 database_id = "37359e67-7f85-4932-b216-c05974daa984"
 
 [[r2_buckets]]
-binding = "BUCKET"
+binding = "scriberry_media"
 bucket_name = "scriberry-media"
 
 [triggers]
