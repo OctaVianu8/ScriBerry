@@ -6,13 +6,14 @@ import { handleMedia } from './modules/media'
 import { handlePush } from './modules/push'
 import { handleSettings } from './modules/settings'
 import { sendScheduledNotifications } from './cron/notifications'
+import type { D1Database, R2Bucket } from '@cloudflare/workers-types'
 
 export interface Env {
   // Bindings — names must match wrangler.toml exactly
   scriberry_db: D1Database
   scriberry_media: R2Bucket
   // Pages assets binding — automatically provided by Cloudflare Pages
-  ASSETS: Fetcher
+  ASSETS: { fetch(request: Request): Promise<Response> }
 
   // Vars / secrets
   ENVIRONMENT: string
@@ -57,7 +58,7 @@ export default {
     return env.ASSETS.fetch(request)
   },
 
-  async scheduled(_event: ScheduledEvent, env: Env): Promise<void> {
+  async scheduled(_event: { scheduledTime: number }, env: Env): Promise<void> {
     await sendScheduledNotifications(env)
   },
 }
