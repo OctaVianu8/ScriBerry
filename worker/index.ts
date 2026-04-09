@@ -20,7 +20,7 @@ export interface Env {
   APPLE_PRIVATE_KEY: string
 }
 
-const JSON_401 = new Response(JSON.stringify({ error: 'Unauthorized' }), {
+const json401 = () => new Response(JSON.stringify({ error: 'Unauthorized' }), {
   status: 401,
   headers: { 'Content-Type': 'application/json' },
 })
@@ -35,7 +35,7 @@ export default {
     // All other /api/* routes require a valid session
     if (pathname.startsWith('/api/')) {
       const userId = await getAuthenticatedUserId(request, env)
-      if (!userId) return JSON_401.clone()
+      if (!userId) return json401()
 
       if (pathname.startsWith('/api/journal')) return handleJournal(request, env, userId)
       if (pathname.startsWith('/api/gym')) return handleGym(request, env, userId)
