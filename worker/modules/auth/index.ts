@@ -189,7 +189,7 @@ async function verifyAppleIdToken(
   const valid = await crypto.subtle.verify(
     'RSASSA-PKCS1-v1_5',
     publicKey,
-    signature,
+    signature.buffer as ArrayBuffer,
     signingInput,
   )
   if (!valid) throw new Error('Apple id_token signature is invalid')
