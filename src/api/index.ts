@@ -18,6 +18,9 @@ export const journalApi = {
   put: (date: string, body: unknown) =>
     apiFetch(`/journal/${date}`, { method: 'PUT', body: JSON.stringify(body) }),
   history: () => apiFetch('/journal/history'),
+  getImages: (date: string) => apiFetch(`/journal/${date}/images`),
+  saveImage: (date: string, body: { r2_url: string; caption?: string }) =>
+    apiFetch(`/journal/${date}/images`, { method: 'POST', body: JSON.stringify(body) }),
 }
 
 // --- Gym ---
@@ -45,8 +48,33 @@ export const calendarApi = {
 // --- Media ---
 
 export const mediaApi = {
+  // Returns { key, uploadUrl } — then PUT the file to uploadUrl
   getUploadUrl: () => apiFetch('/media/upload-url', { method: 'POST' }),
+
+  // Upload raw file to the URL returned above
+  uploadFile: (uploadUrl: string, file: File) =>
+    fetch(uploadUrl, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'Content-Type': file.type || 'application/octet-stream' },
+      body: file,
+    }),
+
   deleteMedia: (id: string) => apiFetch(`/media/${id}`, { method: 'DELETE' }),
+}
+
+// --- Audio ---
+
+export const audioApi = {
+  transcribe: (audioBlob: Blob, filename = 'recording.webm') => {
+    const fd = new FormData()
+    fd.append('audio', audioBlob, filename)
+    return fetch('/api/audio/transcribe', {
+      method: 'POST',
+      credentials: 'include',
+      body: fd,
+    })
+  },
 }
 
 // --- Push ---

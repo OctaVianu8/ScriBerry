@@ -88,6 +88,59 @@ wrangler secret put APPLE_PRIVATE_KEY    # full .p8 file contents
 
 ---
 
+---
+
+## Session 3 — Journal page (2026-04-10)
+
+### Worker (`worker/`)
+- `worker/modules/journal/queries.ts` — `getEntryByDate`, `upsertEntry` (ON CONFLICT upsert), `getHistory` (last 90 days), `getImagesByEntryDate`, `saveJournalImage`
+- `worker/modules/journal/index.ts` — all routes:
+  - `GET /api/journal/history`
+  - `GET /api/journal/:date`
+  - `PUT /api/journal/:date` — upsert entry
+  - `GET /api/journal/:date/images`
+  - `POST /api/journal/:date/images`
+- `worker/modules/media/index.ts` — all routes:
+  - `POST /api/media/upload-url` — allocate R2 key, return upload URL
+  - `PUT /api/media/upload/:key` — stream file body to R2
+  - `GET /api/media/file/:key` — serve from R2 (session-authenticated)
+  - `POST /api/audio/transcribe` — Workers AI Whisper → transcript
+- `worker/index.ts` — added `AI` binding to `Env`, added `/api/audio` route (routed to `handleMedia`)
+
+### Frontend (`src/`)
+- `src/api/index.ts` — added `journalApi.getImages`, `journalApi.saveImage`, `mediaApi.uploadFile`, `audioApi.transcribe`
+- `src/hooks/useAutoSave.ts` — auto-resets from 'saved' → 'idle' after 2.5 s
+- `src/components/RichEditor.tsx` — full rewrite:
+  - TipTap StarterKit (Bold, Italic, Heading H1/H2, Paragraph)
+  - Custom CSS injected once (Georgia serif, dark palette, warm text)
+  - Desktop: floating bubble toolbar (manual selection tracking via `window.getSelection()`)
+  - Mobile: fixed bottom toolbar (`position: fixed; bottom: 0`)
+  - Accepts `initialContent` (TipTap JSON string), `onChange`, `onEditorReady`
+- `src/components/ImageUploader.tsx` — full rewrite:
+  - Asymmetric masonry grid (`columns` CSS property)
+  - Upload flow: `POST /api/media/upload-url` → `PUT uploadUrl` → `POST /api/journal/:date/images`
+  - Supports multiple file selection
+- `src/components/AudioRecorder.tsx` — full rewrite:
+  - Record via `MediaRecorder` API or upload audio file
+  - Animated recording dot while recording
+  - Sends to `POST /api/audio/transcribe`, inserts transcript at cursor
+- `src/pages/Journal.tsx` — full implementation:
+  - Dark, distraction-free writing surface (max-width 720px, centered)
+  - Date header (weekday + long date in warm serif)
+  - Song of the day (inline icon + title + artist inputs)
+  - Optional entry title
+  - TipTap rich editor (RichEditor component)
+  - Highlight callout (gold left-border, italic serif, amber tint)
+  - Image masonry grid + upload
+  - Audio recorder / transcription
+  - Auto-save debounced 1000ms; "Saved ✓" indicator (fixed top-right, fades)
+  - Loads entry + images on mount; remounts editor when date changes
+
+### Config / infra
+- Workers AI `AI` binding must be added in Cloudflare Pages → Settings → Functions → Workers AI Bindings (variable name: `AI`)
+
+---
+
 ## Remaining to build
 
 ### Auth
@@ -98,14 +151,14 @@ wrangler secret put APPLE_PRIVATE_KEY    # full .p8 file contents
 - [ ] ~~Frontend redirect to `/login` when unauthenticated~~ ✅
 
 ### Journal page
-- [ ] Fetch/save entry from API
-- [ ] TipTap toolbar (bold, italic, H1, H2)
-- [ ] Song of the day (Spotify auto-fetch + manual fallback)
-- [ ] Image upload to R2 via signed URL
-- [ ] Audio record → R2 upload → Workers AI transcription
-- [ ] Highlight field
-- [ ] Auto-save with "Saved" indicator
-- [ ] UI stubs: photo collage button, AI highlight button, song-based avatar
+- [ ] ~~Fetch/save entry from API~~ ✅
+- [ ] ~~TipTap toolbar (bold, italic, H1, H2)~~ ✅
+- [ ] ~~Song of the day (manual input)~~ ✅
+- [ ] ~~Image upload to R2~~ ✅
+- [ ] ~~Audio record → Workers AI transcription~~ ✅
+- [ ] ~~Highlight field~~ ✅
+- [ ] ~~Auto-save with "Saved" indicator~~ ✅
+- [ ] Spotify auto-fetch for song of the day (future)
 
 ### Gym page
 - [ ] Session type selector (pill buttons)

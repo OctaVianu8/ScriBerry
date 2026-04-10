@@ -9,9 +9,11 @@ import { sendScheduledNotifications } from './cron/notifications'
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types'
 
 export interface Env {
-  // Bindings — names must match wrangler.toml exactly
+  // Bindings — names must match Cloudflare Pages settings exactly
   scriberry_db: D1Database
   scriberry_media: R2Bucket
+  // Workers AI binding — add "AI" in Pages → Functions → Workers AI Bindings
+  AI: { run(model: string, input: Record<string, unknown>): Promise<unknown> }
   // Pages assets binding — automatically provided by Cloudflare Pages
   ASSETS: { fetch(request: Request): Promise<Response> }
 
@@ -48,6 +50,7 @@ export default {
       if (pathname.startsWith('/api/gym')) return handleGym(request, env, userId)
       if (pathname.startsWith('/api/reading')) return handleReading(request, env, userId)
       if (pathname.startsWith('/api/media')) return handleMedia(request, env, userId)
+      if (pathname.startsWith('/api/audio')) return handleMedia(request, env, userId)
       if (pathname.startsWith('/api/push')) return handlePush(request, env, userId)
       if (pathname.startsWith('/api/settings')) return handleSettings(request, env, userId)
 
