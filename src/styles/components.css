@@ -1,0 +1,309 @@
+/* ============================================================
+   Reusable component styles.
+   Must be global (not CSS Modules) because some of these
+   target TipTap's DOM which we don't control.
+   ============================================================ */
+
+/* ── Formatting toolbar ─────────────────────────────────── */
+
+.sb-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 var(--sp-1);
+  height: var(--toolbar-height);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-bottom: 1px solid var(--c-border-strong);
+  border-radius: var(--r-md) var(--r-md) 0 0;
+  flex-shrink: 0;
+}
+
+.sb-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 32px;
+  border-radius: var(--r-sm);
+  color: var(--c-text-2);
+  font-family: var(--f-ui);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background var(--ease-fast), color var(--ease-fast);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.sb-toolbar-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--c-text-1);
+}
+
+.sb-toolbar-btn:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: -2px;
+}
+
+.sb-toolbar-btn.is-active {
+  background: var(--c-accent-dim);
+  color: var(--c-accent);
+}
+
+.sb-toolbar-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--c-border-strong);
+  margin: 0 var(--sp-1);
+  flex-shrink: 0;
+}
+
+/* ── TipTap / ProseMirror editor ─────────────────────────── */
+
+.sb-editor-wrap {
+  border: 1px solid var(--c-border);
+  border-top: none;
+  border-radius: 0 0 var(--r-md) var(--r-md);
+}
+
+.sb-editor-surface {
+  position: relative;
+}
+
+.sb-editor-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--f-editor);
+  font-size: var(--t-md);
+  line-height: 1.85;
+  color: var(--c-text-placeholder);
+}
+
+.sb-editor .ProseMirror {
+  outline: none;
+  text-align: left !important;
+  font-family: var(--f-editor);
+  font-size: var(--t-md);
+  line-height: 1.85;
+  color: var(--c-text-1);
+  min-height: 280px;
+  word-break: break-word;
+  caret-color: var(--c-accent);
+  padding: var(--sp-5) var(--sp-5);
+}
+
+@media (max-width: 640px) {
+  .sb-editor .ProseMirror {
+    font-size: 16px;
+    padding: var(--sp-4);
+  }
+}
+
+.sb-editor .ProseMirror > *:first-child {
+  margin-top: 0;
+}
+
+.sb-editor .ProseMirror p {
+  margin: 0 0 0.7em;
+  text-align: left !important;
+}
+
+.sb-editor .ProseMirror p:last-child {
+  margin-bottom: 0;
+}
+
+.sb-editor .ProseMirror h1 {
+  text-align: left !important;
+  font-family: var(--f-editor);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--c-text-1);
+  margin: 1.4em 0 0.4em;
+  letter-spacing: -0.3px;
+}
+
+.sb-editor .ProseMirror h2 {
+  text-align: left !important;
+  font-family: var(--f-editor);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--c-text-1);
+  margin: 1.1em 0 0.3em;
+  letter-spacing: -0.15px;
+}
+
+.sb-editor .ProseMirror strong {
+  font-weight: 700;
+  color: #f0ece4;
+}
+
+.sb-editor .ProseMirror em {
+  font-style: italic;
+  color: #d4c8b4;
+}
+
+/* ── Section divider ─────────────────────────────────────── */
+
+.sb-divider {
+  height: 1px;
+  background: var(--c-border);
+  margin: var(--sp-8) 0;
+}
+
+/* ── Highlight / pull-quote callout ─────────────────────── */
+
+.sb-highlight-wrap {
+  border-left: 2px solid var(--c-accent-border);
+  background: var(--c-accent-dim);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  padding: var(--sp-4) var(--sp-5);
+}
+
+.sb-highlight-label {
+  font-family: var(--f-ui);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(201, 169, 110, 0.45);
+  margin-bottom: var(--sp-2);
+}
+
+.sb-highlight-input {
+  width: 100%;
+  resize: none;
+  font-family: var(--f-display);
+  font-size: 16px;
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--c-accent);
+  background: transparent;
+  border: none;
+  outline: none;
+  caret-color: var(--c-accent);
+}
+
+.sb-highlight-input::placeholder {
+  color: rgba(201, 169, 110, 0.28);
+  font-style: italic;
+}
+
+/* ── Song metadata field ─────────────────────────────────── */
+
+.sb-song-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-8);
+}
+
+.sb-song-icon {
+  flex-shrink: 0;
+  color: var(--c-text-3);
+}
+
+.sb-song-input {
+  font-family: var(--f-ui);
+  font-size: var(--t-sm);
+  color: var(--c-text-2);
+  background: transparent;
+  border: none;
+  outline: none;
+  caret-color: var(--c-accent);
+  min-width: 0;
+}
+
+.sb-song-input::placeholder {
+  color: var(--c-text-placeholder);
+}
+
+.sb-song-sep {
+  color: var(--c-border-strong);
+  font-size: var(--t-sm);
+  flex-shrink: 0;
+}
+
+/* ── Saved indicator ─────────────────────────────────────── */
+
+.sb-saved {
+  position: fixed;
+  top: var(--sp-5);
+  right: var(--sp-6);
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.06em;
+  pointer-events: none;
+  z-index: 50;
+  transition: opacity var(--ease-slow);
+}
+
+.sb-saved[data-visible='false'] {
+  opacity: 0;
+}
+.sb-saved[data-visible='true'] {
+  opacity: 1;
+}
+.sb-saved[data-state='saving']  { color: var(--c-text-2); }
+.sb-saved[data-state='saved']   { color: #6b7c5e; }
+.sb-saved[data-state='error']   { color: var(--c-danger); }
+
+/* ── Image grid ──────────────────────────────────────────── */
+
+.sb-image-grid {
+  columns: 2 140px;
+  column-gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
+
+.sb-image-item {
+  break-inside: avoid;
+  margin-bottom: var(--sp-2);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--c-surface-raised);
+}
+
+/* Slight rotation per position — staggered, natural feel */
+.sb-image-item:nth-child(3n+1) { transform: rotate(-1.5deg); }
+.sb-image-item:nth-child(3n+2) { transform: rotate(0.8deg);  }
+.sb-image-item:nth-child(3n)   { transform: rotate(-0.4deg); }
+
+.sb-image-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* ── Ghost / dashed action button ───────────────────────── */
+
+.sb-ghost-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 6px var(--sp-3);
+  border: 1px dashed var(--c-border-strong);
+  border-radius: var(--r-md);
+  background: transparent;
+  color: var(--c-text-2);
+  font-family: var(--f-ui);
+  font-size: var(--t-sm);
+  cursor: pointer;
+  transition: color var(--ease-fast), border-color var(--ease-fast);
+  min-height: 36px;
+}
+
+.sb-ghost-btn:hover {
+  color: var(--c-text-1);
+  border-color: var(--c-border-strong);
+}
+
+.sb-ghost-btn:disabled {
+  color: var(--c-text-3);
+  cursor: not-allowed;
+}

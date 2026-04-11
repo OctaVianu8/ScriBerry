@@ -141,6 +141,37 @@ wrangler secret put APPLE_PRIVATE_KEY    # full .p8 file contents
 
 ---
 
+---
+
+## Session 4 — Design system + Journal redesign (2026-04-11)
+
+### Design system (`src/styles/`)
+- `tokens.css` — all CSS custom properties: colors (`--c-*`), fonts (`--f-*`), type scale (`--t-*`), spacing (`--sp-*`), radii (`--r-*`), transitions (`--ease-*`), layout (`--journal-max-width`, `--toolbar-height`)
+- `global.css` — full reset, body/html base, `#root` (fixed text-align center bug), scrollbar, selection, input/button resets
+- `components.css` — global reusable classes: `.sb-toolbar`, `.sb-toolbar-btn`, `.sb-editor`, `.sb-highlight-wrap`, `.sb-song-row`, `.sb-saved`, `.sb-image-grid`, `.sb-ghost-btn`, etc.
+- `src/index.css` — replaced entirely; now just imports the three CSS layers
+- `index.html` — added Google Fonts: Fraunces (variable opsz serif for display) + Inter (UI)
+
+### Bugs fixed
+- **Editor text centered** — root cause: `text-align: center` on `#root` in old `index.css`. Fixed in `global.css`.
+- **Toolbar not visible on desktop** — previous implementation was a bubble menu (only appeared on text selection). Replaced with a persistent always-visible toolbar pinned directly above the editor, visible on all screen sizes. Uses `onMouseDown` + `e.preventDefault()` to preserve selection while clicking buttons.
+
+### Component rewrites
+- `RichEditor.tsx` — toolbar is now always-visible (no bubble, no media-query toggle). Uses SVG icons for Bold/Italic/Paragraph, text labels for H1/H2. Active state via `is-active` CSS class. `text-align: left !important` in CSS prevents any centering.
+- `ImageUploader.tsx` — uses global `.sb-*` classes; masonry rotation applied via `nth-child` CSS in `components.css` (no JS).
+- `AudioRecorder.tsx` — uses `.sb-ghost-btn`, token variables.
+
+### Journal page (`src/pages/Journal.tsx` + `Journal.module.css`)
+- Date header: Fraunces variable font, large weight-300 display; day number bold, month/year italic
+- Song field: inline metadata row with SVG music icon, plain inputs styled as text
+- Title input: Fraunces, generous size, no border
+- Editor: persistent toolbar → borderless editor surface inside `.sb-editor-wrap`
+- Highlight: left gold border + amber tint + Fraunces italic textarea
+- Loading skeleton: correctly sized placeholder while API loads
+- Saved indicator: monospace, fixed top-right, opacity-only transition
+
+---
+
 ## Remaining to build
 
 ### Auth
