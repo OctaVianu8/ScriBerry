@@ -1,4 +1,5 @@
 import type { Env } from '../../index'
+import { getImageByUrlAndUser } from './queries'
 
 const json = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), {
@@ -31,11 +32,14 @@ export async function handleMedia(
     return json({ url: `/api/media/file/${encodeURIComponent(key)}` })
   }
 
-  // GET /api/media/file/:key — serve from R2 (session-authenticated via cookie)
-  const fileMatch = pathname.match(/^\/api\/media\/file\/(.+)$/)
+  // GET /api/media/file/:key — serve from R2 (session-authenticated via DB lookup)
+  const fileMatch = pathname.match(/^\/api\/media\/file\/([^/]+)$/)
   if (fileMatch && method === 'GET') {
-    const key = decodeURIComponent(fileMatch[1])
-    if (!key.startsWith(`${userId}/`)) return json({ error: 'Forbidden' }, 403)
+    const key = fileMatch[1]
+    const r2_url = `/api/media/file/${key}`
+    // Verify the image belongs to this user via the DB
+    const owned = await getImageByUrlAndUser(env.scriberry_db, r2_url, userId)
+    if (!owned) return json({ error: 'Forbidden' }, 403)
     const object = await env.scriberry_media.get(key)
     if (!object) return new Response('Not found', { status: 404 })
     const headers = new Headers()
