@@ -4,6 +4,7 @@ import {
   upsertEntry,
   getHistory,
   getImagesByEntryDate,
+  getImageById,
   saveJournalImage,
 } from './queries'
 
@@ -66,47 +67,15 @@ export async function handleJournal(
     if (method === 'POST') {
       const ct = request.headers.get('Content-Type') ?? ''
 
-      if (ct.includes('multipart/form-data')) {
-        // Direct file upload — single round-trip (FormData with 'file' field)
-        const formData = await request.formData()
-        const file = formData.get('file') as File | null
-        if (!file) return json({ error: 'Missing file field' }, 400)
-
-        // Ensure entry exists
-        let entry = await getEntryByDate(env.scriberry_db, userId, date)
-        if (!entry) {
-          await upsertEntry(env.scriberry_db, crypto.randomUUID(), userId, date, {})
-          entry = await getEntryByDate(env.scriberry_db, userId, date)
-        }
-        if (!entry) return json({ error: 'Failed to create entry' }, 500)
-
-        // Upload to R2.
-        // R2 key === URL path suffix: userId/uuid
-        // r2_url stored in DB === img src === /api/media/file/userId/uuid
-        // The key is embedded directly in the URL — no reconstruction needed at serve time.
-        const r2Key = `${userId}/${crypto.randomUUID()}`
-        const fileType = file.type || 'application/octet-stream'
-        try {
-          await env.scriberry_media.put(r2Key, await file.arrayBuffer(), {
-            httpMetadata: { contentType: fileType },
-          })
-        } catch (e) {
-          console.error('R2 upload error:', e)
-          return json({ error: 'Failed to store image' }, 500)
-        }
-
-        const r2_url = `/api/media/file/${r2Key}`
-        const imageId = crypto.randomUUID()
-        await saveJournalImage(env.scriberry_db, imageId, entry.id, r2_url, undefined)
-        return json({ id: imageId, r2_url, caption: null })
+      if (!ct.includes('multipart/form-data')) {
+        return json({ error: 'Expected multipart/form-data' }, 400)
       }
 
-      // Legacy JSON body path (kept for compatibility)
-      const { r2_url, caption } = (await request.json()) as {
-        r2_url: string
-        caption?: string
-      }
+      const formData = await request.formData()
+      const file = formData.get('file') as File | null
+      if (!file) return json({ error: 'Missing file field' }, 400)
 
+      // Ensure entry exists
       let entry = await getEntryByDate(env.scriberry_db, userId, date)
       if (!entry) {
         await upsertEntry(env.scriberry_db, crypto.randomUUID(), userId, date, {})
@@ -114,10 +83,48 @@ export async function handleJournal(
       }
       if (!entry) return json({ error: 'Failed to create entry' }, 500)
 
+      // Use imageId as the R2 key — simple UUID, no prefix, no reconstruction needed.
+      // r2_url stored in DB === img src === /api/journal/:date/images/:imageId
       const imageId = crypto.randomUUID()
-      await saveJournalImage(env.scriberry_db, imageId, entry.id, r2_url, caption)
-      return json({ id: imageId, r2_url, caption: caption ?? null })
+      const fileType = file.type || 'application/octet-stream'
+      try {
+        await env.scriberry_media.put(imageId, await file.arrayBuffer(), {
+          httpMetadata: { contentType: fileType },
+        })
+      } catch (e) {
+        console.error('R2 upload error:', e)
+        return json({ error: 'Failed to store image' }, 500)
+      }
+
+      const r2_url = `/api/journal/${date}/images/${imageId}`
+      await saveJournalImage(env.scriberry_db, imageId, entry.id, r2_url, undefined)
+      return json({ id: imageId, r2_url, caption: null })
     }
+  }
+
+  // GET /api/journal/:date/images/:imageId — serve image from R2
+  const imageFileMatch = pathname.match(
+    /^\/api\/journal\/(\d{4}-\d{2}-\d{2})\/images\/([0-9a-f-]+)$/,
+  )
+  if (imageFileMatch && method === 'GET') {
+    const imageId = imageFileMatch[2]
+
+    // DB ownership check — ensures this image belongs to the authenticated user
+    const image = await getImageById(env.scriberry_db, imageId, userId)
+    if (!image) return json({ error: 'Not found' }, 404)
+
+    const object = await env.scriberry_media.get(imageId)
+    if (!object) return new Response('Not found', { status: 404 })
+
+    const body = await object.arrayBuffer()
+    const contentType = object.httpMetadata?.contentType ?? 'application/octet-stream'
+
+    return new Response(body, {
+      headers: {
+        'Content-Type': contentType,
+        'Cache-Control': 'private, max-age=86400',
+      },
+    })
   }
 
   return new Response('Not found', { status: 404 })

@@ -105,6 +105,22 @@ export async function getImagesByEntryDate(
   return result.results
 }
 
+export async function getImageById(
+  db: D1Database,
+  imageId: string,
+  userId: string,
+): Promise<JournalImage | null> {
+  return db
+    .prepare(
+      `SELECT ji.id, ji.r2_url, ji.caption
+       FROM journal_images ji
+       JOIN journal_entries je ON ji.entry_id = je.id
+       WHERE ji.id = ? AND je.user_id = ?`,
+    )
+    .bind(imageId, userId)
+    .first<JournalImage>()
+}
+
 export async function saveJournalImage(
   db: D1Database,
   id: string,
