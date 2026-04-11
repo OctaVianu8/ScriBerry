@@ -14,38 +14,33 @@ export async function handleMedia(
 ): Promise<Response> {
   const { pathname, method } = new URL(request.url)
 
-  // POST /api/media/upload-url — allocate a key; client will PUT the file
-  if (pathname === '/api/media/upload-url' && method === 'POST') {
-    const key = `${userId}/${crypto.randomUUID()}`
-    return json({ key, uploadUrl: `/api/media/upload/${encodeURIComponent(key)}` })
-  }
-
-  // PUT /api/media/upload/:key — stream file body into R2
-  const uploadMatch = pathname.match(/^\/api\/media\/upload\/(.+)$/)
-  if (uploadMatch && method === 'PUT') {
-    const key = decodeURIComponent(uploadMatch[1])
-    if (!key.startsWith(`${userId}/`)) return json({ error: 'Forbidden' }, 403)
-    const contentType = request.headers.get('Content-Type') ?? 'application/octet-stream'
-    await env.scriberry_media.put(key, request.body, {
-      httpMetadata: { contentType },
-    })
-    return json({ url: `/api/media/file/${encodeURIComponent(key)}` })
-  }
-
-  // GET /api/media/file/:key — serve from R2 (session-authenticated via DB lookup)
-  const fileMatch = pathname.match(/^\/api\/media\/file\/([^/]+)$/)
+  // GET /api/media/file/:uuid — serve image from R2
+  // Key format in R2: userId/uuid  (organized by user)
+  // URL uses only the uuid — no path encoding issues
+  const fileMatch = pathname.match(/^\/api\/media\/file\/([0-9a-f-]+)$/)
   if (fileMatch && method === 'GET') {
-    const key = fileMatch[1]
-    const r2_url = `/api/media/file/${key}`
-    // Verify the image belongs to this user via the DB
+    const uuid = fileMatch[1]
+    const r2_url = `/api/media/file/${uuid}`
+
+    // Verify ownership via DB before serving
     const owned = await getImageByUrlAndUser(env.scriberry_db, r2_url, userId)
     if (!owned) return json({ error: 'Forbidden' }, 403)
-    const object = await env.scriberry_media.get(key)
+
+    // Reconstruct the R2 key: userId/uuid
+    const r2Key = `${userId}/${uuid}`
+    const object = await env.scriberry_media.get(r2Key)
     if (!object) return new Response('Not found', { status: 404 })
-    const headers = new Headers()
-    object.writeHttpMetadata(headers)
-    headers.set('Cache-Control', 'private, max-age=31536000, immutable')
-    return new Response(object.body, { headers })
+
+    // Read the full body as ArrayBuffer — more reliable than streaming object.body
+    const body = await object.arrayBuffer()
+    const contentType = object.httpMetadata?.contentType ?? 'application/octet-stream'
+
+    return new Response(body, {
+      headers: {
+        'Content-Type': contentType,
+        'Cache-Control': 'private, max-age=86400',
+      },
+    })
   }
 
   // POST /api/audio/transcribe — Workers AI Whisper

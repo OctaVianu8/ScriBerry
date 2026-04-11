@@ -80,11 +80,14 @@ export async function handleJournal(
         }
         if (!entry) return json({ error: 'Failed to create entry' }, 500)
 
-        // Upload to R2 — use a plain UUID as key (no path separators, no encoding issues)
-        const key = crypto.randomUUID()
+        // Upload to R2
+        // R2 key:  userId/uuid  — files organized per user in R2
+        // r2_url:  /api/media/file/uuid  — only the UUID in the URL, no encoding issues
+        const uuid = crypto.randomUUID()
+        const r2Key = `${userId}/${uuid}`
         const fileType = file.type || 'application/octet-stream'
         try {
-          await env.scriberry_media.put(key, await file.arrayBuffer(), {
+          await env.scriberry_media.put(r2Key, await file.arrayBuffer(), {
             httpMetadata: { contentType: fileType },
           })
         } catch (e) {
@@ -92,7 +95,7 @@ export async function handleJournal(
           return json({ error: 'Failed to store image' }, 500)
         }
 
-        const r2_url = `/api/media/file/${key}`
+        const r2_url = `/api/media/file/${uuid}`
         const imageId = crypto.randomUUID()
         await saveJournalImage(env.scriberry_db, imageId, entry.id, r2_url, undefined)
         return json({ id: imageId, r2_url, caption: null })
