@@ -1,0 +1,51 @@
+/* Image grid */
+
+.grid {
+  columns: 2 140px;
+  column-gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
+
+.item {
+  break-inside: avoid;
+  margin-bottom: var(--sp-2);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--c-surface-raised);
+}
+
+.item:nth-child(3n+1) { transform: rotate(-1.5deg); }
+.item:nth-child(3n+2) { transform: rotate(0.8deg); }
+.item:nth-child(3n)   { transform: rotate(-0.4deg); }
+
+.item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+/* Broken image placeholder */
+
+.broken {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-5) var(--sp-3);
+  color: var(--c-text-3);
+  font-family: var(--f-ui);
+  font-size: var(--t-xs);
+  text-align: center;
+  min-height: 80px;
+}
+
+/* Upload error message */
+
+.error {
+  font-family: var(--f-ui);
+  font-size: var(--t-xs);
+  color: var(--c-danger);
+  margin-bottom: var(--sp-2);
+}

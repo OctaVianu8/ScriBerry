@@ -1,5 +1,4 @@
 import type { Env } from '../../index'
-import { getImageByUrlAndUser } from './queries'
 
 const json = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), {
@@ -14,24 +13,25 @@ export async function handleMedia(
 ): Promise<Response> {
   const { pathname, method } = new URL(request.url)
 
-  // GET /api/media/file/:uuid — serve image from R2
-  // Key format in R2: userId/uuid  (organized by user)
-  // URL uses only the uuid — no path encoding issues
-  const fileMatch = pathname.match(/^\/api\/media\/file\/([0-9a-f-]+)$/)
+  // GET /api/media/file/:userId/:uuid — serve image from R2
+  //
+  // The R2 key is identical to the URL suffix after /api/media/file/.
+  // Example: /api/media/file/abc-user-id/def-image-uuid
+  //          → R2 key = "abc-user-id/def-image-uuid"
+  //
+  // Auth: the key must start with the authenticated user's id.
+  // No DB lookup needed — ownership is encoded in the path.
+  const fileMatch = pathname.match(/^\/api\/media\/file\/(.+)$/)
   if (fileMatch && method === 'GET') {
-    const uuid = fileMatch[1]
-    const r2_url = `/api/media/file/${uuid}`
+    const r2Key = fileMatch[1]
 
-    // Verify ownership via DB before serving
-    const owned = await getImageByUrlAndUser(env.scriberry_db, r2_url, userId)
-    if (!owned) return json({ error: 'Forbidden' }, 403)
+    if (!r2Key.startsWith(`${userId}/`)) {
+      return json({ error: 'Forbidden' }, 403)
+    }
 
-    // Reconstruct the R2 key: userId/uuid
-    const r2Key = `${userId}/${uuid}`
     const object = await env.scriberry_media.get(r2Key)
     if (!object) return new Response('Not found', { status: 404 })
 
-    // Read the full body as ArrayBuffer — more reliable than streaming object.body
     const body = await object.arrayBuffer()
     const contentType = object.httpMetadata?.contentType ?? 'application/octet-stream'
 

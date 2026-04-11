@@ -250,31 +250,6 @@
 .sb-saved[data-state='saved']   { color: var(--c-success); }
 .sb-saved[data-state='error']   { color: var(--c-danger); }
 
-/* ── Image grid ──────────────────────────────────────────── */
-
-.sb-image-grid {
-  columns: 2 140px;
-  column-gap: var(--sp-2);
-  margin-bottom: var(--sp-4);
-}
-
-.sb-image-item {
-  break-inside: avoid;
-  margin-bottom: var(--sp-2);
-  border-radius: var(--r-md);
-  overflow: hidden;
-  background: var(--c-surface-raised);
-}
-
-.sb-image-item:nth-child(3n+1) { transform: rotate(-1.5deg); }
-.sb-image-item:nth-child(3n+2) { transform: rotate(0.8deg); }
-.sb-image-item:nth-child(3n)   { transform: rotate(-0.4deg); }
-
-.sb-image-item img {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-}
 
 /* ── Ghost / dashed action button ───────────────────────── */
 
