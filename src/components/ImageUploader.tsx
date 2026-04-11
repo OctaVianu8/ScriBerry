@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { mediaApi, journalApi } from '../api'
+import { journalApi } from '../api'
 
 interface JournalImage {
   id: string
@@ -15,33 +15,37 @@ interface ImageUploaderProps {
 
 export default function ImageUploader({ date, images, onImagesChange }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
   async function handleFiles(files: FileList | null) {
     if (!files || files.length === 0) return
     setUploading(true)
+    setError(null)
     let current = images
     try {
       for (const file of Array.from(files)) {
-        const urlRes = await mediaApi.getUploadUrl()
-        if (!urlRes.ok) throw new Error('Failed to get upload URL')
-        const { uploadUrl } = (await urlRes.json()) as { key: string; uploadUrl: string }
-
-        const uploadRes = await mediaApi.uploadFile(uploadUrl, file)
-        if (!uploadRes.ok) throw new Error('Upload failed')
-        const { url: r2_url } = (await uploadRes.json()) as { url: string }
-
-        const saveRes = await journalApi.saveImage(date, { r2_url })
-        if (!saveRes.ok) throw new Error('Failed to save image record')
-        const newImage = (await saveRes.json()) as JournalImage
-
+        const res = await journalApi.uploadImage(date, file)
+        if (!res.ok) {
+          let msg = `Upload failed (${res.status})`
+          try {
+            const body = await res.json() as { error?: string }
+            if (body.error) msg = body.error
+          } catch { /* ignore JSON parse error */ }
+          throw new Error(msg)
+        }
+        const newImage = (await res.json()) as JournalImage
         current = [...current, newImage]
         onImagesChange(current)
       }
     } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Upload failed'
+      setError(msg)
       console.error('Image upload error:', err)
     } finally {
       setUploading(false)
+      // Reset the file input so the same file can be re-selected after an error
+      if (fileRef.current) fileRef.current.value = ''
     }
   }
 
@@ -55,6 +59,17 @@ export default function ImageUploader({ date, images, onImagesChange }: ImageUpl
             </div>
           ))}
         </div>
+      )}
+
+      {error && (
+        <p style={{
+          fontFamily: 'var(--f-ui)',
+          fontSize: 'var(--t-xs)',
+          color: 'var(--c-danger)',
+          marginBottom: 'var(--sp-2)',
+        }}>
+          {error}
+        </p>
       )}
 
       <input

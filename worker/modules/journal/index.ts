@@ -64,12 +64,46 @@ export async function handleJournal(
     }
 
     if (method === 'POST') {
+      const ct = request.headers.get('Content-Type') ?? ''
+
+      if (ct.includes('multipart/form-data')) {
+        // Direct file upload — single round-trip (FormData with 'file' field)
+        const formData = await request.formData()
+        const file = formData.get('file') as File | null
+        if (!file) return json({ error: 'Missing file field' }, 400)
+
+        // Ensure entry exists
+        let entry = await getEntryByDate(env.scriberry_db, userId, date)
+        if (!entry) {
+          await upsertEntry(env.scriberry_db, crypto.randomUUID(), userId, date, {})
+          entry = await getEntryByDate(env.scriberry_db, userId, date)
+        }
+        if (!entry) return json({ error: 'Failed to create entry' }, 500)
+
+        // Upload to R2
+        const key = `${userId}/${crypto.randomUUID()}`
+        const fileType = file.type || 'application/octet-stream'
+        try {
+          await env.scriberry_media.put(key, await file.arrayBuffer(), {
+            httpMetadata: { contentType: fileType },
+          })
+        } catch (e) {
+          console.error('R2 upload error:', e)
+          return json({ error: 'Failed to store image' }, 500)
+        }
+
+        const r2_url = `/api/media/file/${encodeURIComponent(key)}`
+        const imageId = crypto.randomUUID()
+        await saveJournalImage(env.scriberry_db, imageId, entry.id, r2_url, undefined)
+        return json({ id: imageId, r2_url, caption: null })
+      }
+
+      // Legacy JSON body path (kept for compatibility)
       const { r2_url, caption } = (await request.json()) as {
         r2_url: string
         caption?: string
       }
 
-      // Ensure the entry exists before attaching an image
       let entry = await getEntryByDate(env.scriberry_db, userId, date)
       if (!entry) {
         await upsertEntry(env.scriberry_db, crypto.randomUUID(), userId, date, {})

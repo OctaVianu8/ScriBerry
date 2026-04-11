@@ -21,6 +21,17 @@ export const journalApi = {
   getImages: (date: string) => apiFetch(`/journal/${date}/images`),
   saveImage: (date: string, body: { r2_url: string; caption?: string }) =>
     apiFetch(`/journal/${date}/images`, { method: 'POST', body: JSON.stringify(body) }),
+  // Direct file upload — single FormData POST (preferred over the upload-url flow)
+  uploadImage: (date: string, file: File) => {
+    const fd = new FormData()
+    fd.append('file', file)
+    return fetch(`/api/journal/${date}/images`, {
+      method: 'POST',
+      credentials: 'include',
+      body: fd,
+      // No Content-Type header — browser sets multipart/form-data with boundary automatically
+    })
+  },
 }
 
 // --- Gym ---
