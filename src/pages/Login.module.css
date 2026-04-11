@@ -1,0 +1,67 @@
+/* Login page */
+
+.page {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--c-bg);
+  font-family: var(--f-ui);
+}
+
+.card {
+  width: 100%;
+  max-width: 360px;
+  padding: var(--sp-12) var(--sp-8);
+  text-align: center;
+}
+
+.title {
+  margin: 0 0 var(--sp-2);
+  font-family: var(--f-display);
+  font-size: var(--t-3xl);
+  font-weight: 600;
+  color: var(--c-text-1);
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  margin: 0 0 var(--sp-10);
+  font-size: var(--t-sm);
+  color: var(--c-text-3);
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  height: 48px;
+  border-radius: var(--r-md);
+  font-size: var(--t-base);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity var(--ease-fast);
+}
+
+.btn:hover {
+  opacity: 0.88;
+}
+
+.btnGoogle {
+  background: #fff;
+  color: #1a1a1a;
+}
+
+.btnApple {
+  background: var(--c-surface-2);
+  color: var(--c-text-1);
+  border: 1px solid var(--c-border-strong);
+}

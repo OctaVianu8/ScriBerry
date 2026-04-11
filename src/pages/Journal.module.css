@@ -12,6 +12,12 @@
   padding: var(--sp-12) var(--sp-8) var(--sp-16);
 }
 
+@media (max-width: 768px) {
+  .page {
+    padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + var(--sp-8));
+  }
+}
+
 @media (max-width: 640px) {
   .inner {
     padding: var(--sp-8) var(--sp-5) var(--sp-16);

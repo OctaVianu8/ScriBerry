@@ -1,7 +1,6 @@
 /* ============================================================
-   Reusable component styles.
-   Must be global (not CSS Modules) because some of these
-   target TipTap's DOM which we don't control.
+   Reusable component styles (global — not CSS Modules).
+   Some rules target TipTap's DOM which we can't scope.
    ============================================================ */
 
 /* ── Formatting toolbar ─────────────────────────────────── */
@@ -23,8 +22,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 32px;
+  min-width: 36px;
+  min-height: 36px;
   border-radius: var(--r-sm);
   color: var(--c-text-2);
   font-family: var(--f-ui);
@@ -32,11 +31,10 @@
   font-weight: 500;
   transition: background var(--ease-fast), color var(--ease-fast);
   flex-shrink: 0;
-  position: relative;
 }
 
 .sb-toolbar-btn:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--c-surface-raised);
   color: var(--c-text-1);
 }
 
@@ -64,6 +62,7 @@
   border: 1px solid var(--c-border);
   border-top: none;
   border-radius: 0 0 var(--r-md) var(--r-md);
+  overflow: hidden;
 }
 
 .sb-editor-surface {
@@ -80,6 +79,13 @@
   font-size: var(--t-md);
   line-height: 1.85;
   color: var(--c-text-placeholder);
+  padding: var(--sp-5);
+}
+
+@media (max-width: 640px) {
+  .sb-editor-placeholder {
+    padding: var(--sp-4);
+  }
 }
 
 .sb-editor .ProseMirror {
@@ -92,7 +98,7 @@
   min-height: 280px;
   word-break: break-word;
   caret-color: var(--c-accent);
-  padding: var(--sp-5) var(--sp-5);
+  padding: var(--sp-5);
 }
 
 @media (max-width: 640px) {
@@ -102,18 +108,13 @@
   }
 }
 
-.sb-editor .ProseMirror > *:first-child {
-  margin-top: 0;
-}
+.sb-editor .ProseMirror > *:first-child { margin-top: 0; }
 
 .sb-editor .ProseMirror p {
   margin: 0 0 0.7em;
   text-align: left !important;
 }
-
-.sb-editor .ProseMirror p:last-child {
-  margin-bottom: 0;
-}
+.sb-editor .ProseMirror p:last-child { margin-bottom: 0; }
 
 .sb-editor .ProseMirror h1 {
   text-align: left !important;
@@ -139,12 +140,12 @@
 
 .sb-editor .ProseMirror strong {
   font-weight: 700;
-  color: #f0ece4;
+  color: var(--c-text-1);
 }
 
 .sb-editor .ProseMirror em {
   font-style: italic;
-  color: #d4c8b4;
+  color: var(--c-text-2);
 }
 
 /* ── Section divider ─────────────────────────────────────── */
@@ -170,7 +171,7 @@
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(201, 169, 110, 0.45);
+  color: var(--c-text-3);
   margin-bottom: var(--sp-2);
 }
 
@@ -186,10 +187,11 @@
   border: none;
   outline: none;
   caret-color: var(--c-accent);
+  text-align: left;
 }
 
 .sb-highlight-input::placeholder {
-  color: rgba(201, 169, 110, 0.28);
+  color: var(--c-text-3);
   font-style: italic;
 }
 
@@ -242,14 +244,10 @@
   transition: opacity var(--ease-slow);
 }
 
-.sb-saved[data-visible='false'] {
-  opacity: 0;
-}
-.sb-saved[data-visible='true'] {
-  opacity: 1;
-}
-.sb-saved[data-state='saving']  { color: var(--c-text-2); }
-.sb-saved[data-state='saved']   { color: #6b7c5e; }
+.sb-saved[data-visible='false'] { opacity: 0; }
+.sb-saved[data-visible='true']  { opacity: 1; }
+.sb-saved[data-state='saving']  { color: var(--c-text-3); }
+.sb-saved[data-state='saved']   { color: var(--c-success); }
 .sb-saved[data-state='error']   { color: var(--c-danger); }
 
 /* ── Image grid ──────────────────────────────────────────── */
@@ -268,13 +266,11 @@
   background: var(--c-surface-raised);
 }
 
-/* Slight rotation per position — staggered, natural feel */
 .sb-image-item:nth-child(3n+1) { transform: rotate(-1.5deg); }
-.sb-image-item:nth-child(3n+2) { transform: rotate(0.8deg);  }
+.sb-image-item:nth-child(3n+2) { transform: rotate(0.8deg); }
 .sb-image-item:nth-child(3n)   { transform: rotate(-0.4deg); }
 
 .sb-image-item img {
-  display: block;
   width: 100%;
   height: auto;
   object-fit: cover;
@@ -294,13 +290,14 @@
   font-family: var(--f-ui);
   font-size: var(--t-sm);
   cursor: pointer;
-  transition: color var(--ease-fast), border-color var(--ease-fast);
-  min-height: 36px;
+  transition: color var(--ease-fast), border-color var(--ease-fast), background var(--ease-fast);
+  min-height: 44px; /* touch target */
 }
 
 .sb-ghost-btn:hover {
   color: var(--c-text-1);
-  border-color: var(--c-border-strong);
+  background: var(--c-surface-2);
+  border-style: solid;
 }
 
 .sb-ghost-btn:disabled {

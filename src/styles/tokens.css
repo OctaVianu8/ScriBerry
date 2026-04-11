@@ -1,30 +1,31 @@
 /* ============================================================
    Design tokens — every value used in the app lives here.
-   Import this file before anything else.
    ============================================================ */
 
 :root {
-  /* ── Colors ──────────────────────────────────────────── */
-  --c-bg:              #0a0a0a;
-  --c-surface:         #111110;
-  --c-surface-raised:  #181714;
-  --c-surface-overlay: #1e1c1a;
+  /* ── Colors — WCAG AA palette ───────────────────────────── */
+  --c-bg:              #0d0d0d;
+  --c-surface:         #1a1a1a;
+  --c-surface-2:       #222222;
+  --c-surface-raised:  #2a2a2a;
+  --c-surface-overlay: #333333;
 
-  --c-border:          rgba(255, 255, 255, 0.07);
-  --c-border-strong:   rgba(255, 255, 255, 0.13);
+  --c-border:          #2e2e2e;
+  --c-border-strong:   #3a3a3a;
 
-  --c-text-1:          #e8e3d5;   /* primary — body text */
-  --c-text-2:          #7a7268;   /* secondary — labels, meta */
-  --c-text-3:          #40393480; /* muted — placeholders, very dim */
-  --c-text-placeholder:#35312d;
+  --c-text-1:          #f0f0f0;   /* primary — AA on #0d0d0d: 16:1 */
+  --c-text-2:          #a0a0a0;   /* secondary — AA on #0d0d0d: 7:1 */
+  --c-text-3:          #666666;   /* muted — use sparingly */
+  --c-text-placeholder:#444444;
 
-  --c-accent:          #c9a96e;   /* warm gold */
-  --c-accent-dim:      rgba(201, 169, 110, 0.1);
-  --c-accent-border:   rgba(201, 169, 110, 0.32);
+  --c-accent:          #4f8ef7;   /* electric blue */
+  --c-accent-dim:      rgba(79, 142, 247, 0.15);
+  --c-accent-border:   rgba(79, 142, 247, 0.4);
 
-  --c-danger:          #c06060;
+  --c-danger:          #e05c5c;
+  --c-success:         #5cb85c;
 
-  /* ── Typography ──────────────────────────────────────── */
+  /* ── Typography ──────────────────────────────────────────── */
   --f-display: 'Fraunces', Georgia, serif;
   --f-ui:      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --f-editor:  Georgia, 'Times New Roman', serif;
@@ -40,7 +41,7 @@
   --t-2xl:  34px;
   --t-3xl:  48px;
 
-  /* ── Spacing (4 px base) ─────────────────────────────── */
+  /* ── Spacing (4 px base) ─────────────────────────────────── */
   --sp-1:  4px;
   --sp-2:  8px;
   --sp-3:  12px;
@@ -52,17 +53,21 @@
   --sp-12: 48px;
   --sp-16: 64px;
 
-  /* ── Radii ───────────────────────────────────────────── */
+  /* ── Radii ───────────────────────────────────────────────── */
   --r-sm: 4px;
   --r-md: 8px;
   --r-lg: 12px;
+  --r-xl: 16px;
 
-  /* ── Transitions ─────────────────────────────────────── */
+  /* ── Transitions ─────────────────────────────────────────── */
   --ease-fast: 100ms ease;
   --ease-base: 180ms ease;
-  --ease-slow: 320ms ease;
+  --ease-slow: 300ms ease;
 
-  /* ── Layout ──────────────────────────────────────────── */
-  --journal-max-width: 680px;
-  --toolbar-height:    44px;
+  /* ── Layout ──────────────────────────────────────────────── */
+  --journal-max-width:   680px;
+  --toolbar-height:      44px;
+  --sidebar-w-expanded:  240px;
+  --sidebar-w-collapsed: 56px;
+  --bottom-nav-h:        56px;
 }

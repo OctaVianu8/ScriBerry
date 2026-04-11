@@ -1,31 +1,31 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import styles from './Login.module.css'
 
 export default function Login() {
   const { user, loading } = useAuth()
   const navigate = useNavigate()
 
-  // If already authenticated, redirect to the app
   useEffect(() => {
     if (!loading && user) navigate('/', { replace: true })
   }, [user, loading, navigate])
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>Scriberry</h1>
-        <p style={styles.subtitle}>Your personal journal & habit tracker</p>
+    <div className={styles.page}>
+      <div className={styles.card}>
+        <h1 className={styles.title}>Scriberry</h1>
+        <p className={styles.subtitle}>Your personal journal &amp; habit tracker</p>
 
-        <div style={styles.buttons}>
+        <div className={styles.buttons}>
           {/* Full-page navigation — not a React Router link — because the
               target is a server-side OAuth redirect */}
-          <a href="/api/auth/google" style={{ ...styles.btn, ...styles.btnGoogle }}>
+          <a href="/api/auth/google" className={`${styles.btn} ${styles.btnGoogle}`}>
             <GoogleIcon />
             Sign in with Google
           </a>
 
-          <a href="/api/auth/apple" style={{ ...styles.btn, ...styles.btnApple }}>
+          <a href="/api/auth/apple" className={`${styles.btn} ${styles.btnApple}`}>
             <AppleIcon />
             Sign in with Apple
           </a>
@@ -33,67 +33,6 @@ export default function Login() {
       </div>
     </div>
   )
-}
-
-// ---------------------------------------------------------------------------
-// Inline styles
-// ---------------------------------------------------------------------------
-
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: '#0a0a0a',
-    fontFamily:
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  },
-  card: {
-    width: '100%',
-    maxWidth: 360,
-    padding: '48px 32px',
-    textAlign: 'center',
-  },
-  title: {
-    margin: '0 0 8px',
-    fontSize: 32,
-    fontWeight: 700,
-    color: '#f5f5f5',
-    letterSpacing: '-0.5px',
-  },
-  subtitle: {
-    margin: '0 0 40px',
-    fontSize: 14,
-    color: '#666',
-  },
-  buttons: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 12,
-  },
-  btn: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    height: 48,
-    borderRadius: 10,
-    fontSize: 15,
-    fontWeight: 500,
-    textDecoration: 'none',
-    cursor: 'pointer',
-    transition: 'opacity 0.15s',
-  },
-  btnGoogle: {
-    background: '#fff',
-    color: '#1a1a1a',
-  },
-  btnApple: {
-    background: '#1a1a1a',
-    color: '#f5f5f5',
-    border: '1px solid #2a2a2a',
-  },
 }
 
 // ---------------------------------------------------------------------------
