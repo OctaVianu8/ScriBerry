@@ -86,9 +86,10 @@ export async function handleJournal(
       // Use imageId as the R2 key — simple UUID, no prefix, no reconstruction needed.
       // r2_url stored in DB === img src === /api/journal/:date/images/:imageId
       const imageId = crypto.randomUUID()
+      const r2Key = `${userId}/${imageId}`
       const fileType = file.type || 'application/octet-stream'
       try {
-        await env.scriberry_media.put(imageId, await file.arrayBuffer(), {
+        await env.scriberry_media.put(r2Key, await file.arrayBuffer(), {
           httpMetadata: { contentType: fileType },
         })
       } catch (e) {
@@ -113,7 +114,7 @@ export async function handleJournal(
     const image = await getImageById(env.scriberry_db, imageId, userId)
     if (!image) return json({ error: 'Not found' }, 404)
 
-    const object = await env.scriberry_media.get(imageId)
+    const object = await env.scriberry_media.get(`${userId}/${imageId}`)
     if (!object) return new Response('Not found', { status: 404 })
 
     const body = await object.arrayBuffer()
