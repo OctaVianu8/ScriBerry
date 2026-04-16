@@ -251,6 +251,207 @@
 .sb-saved[data-state='error']   { color: var(--c-danger); }
 
 
+/* ── Date header (shared across Journal, Gym, Reading) ─── */
+
+.sb-date-weekday {
+  font-family: var(--f-ui);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-text-3);
+  margin-bottom: var(--sp-1);
+}
+
+.sb-date-display {
+  font-family: var(--f-display);
+  font-size: var(--t-3xl);
+  font-weight: 300;
+  font-optical-sizing: auto;
+  color: var(--c-text-2);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+@media (max-width: 640px) {
+  .sb-date-display {
+    font-size: var(--t-2xl);
+  }
+}
+
+/* ── Page layout shell (shared) ─────────────────────────── */
+
+.sb-page {
+  min-height: 100dvh;
+  background: var(--c-bg);
+  padding-bottom: var(--sp-16);
+}
+
+.sb-page-inner {
+  max-width: var(--journal-max-width);
+  margin: 0 auto;
+  padding: var(--sp-12) var(--sp-8) var(--sp-16);
+}
+
+@media (max-width: 768px) {
+  .sb-page {
+    padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + var(--sp-8));
+  }
+}
+
+@media (max-width: 640px) {
+  .sb-page-inner {
+    padding: var(--sp-8) var(--sp-5) var(--sp-16);
+  }
+}
+
+/* ── Pill selector (single-select button row) ────────────── */
+
+.sb-pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.sb-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: 999px;
+  border: 1px solid var(--c-border-strong);
+  background: transparent;
+  color: var(--c-text-2);
+  font-family: var(--f-ui);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--ease-fast), color var(--ease-fast), border-color var(--ease-fast);
+  user-select: none;
+}
+
+.sb-pill:hover {
+  background: var(--c-surface-2);
+  color: var(--c-text-1);
+}
+
+.sb-pill[data-selected='true'] {
+  background: var(--c-accent-dim);
+  color: var(--c-accent);
+  border-color: var(--c-accent-border);
+}
+
+.sb-pill[data-muted='true'] {
+  color: var(--c-text-3);
+  border-color: var(--c-border);
+}
+
+.sb-pill[data-muted='true']:hover {
+  color: var(--c-text-2);
+  background: var(--c-surface);
+}
+
+.sb-pill[data-muted='true'][data-selected='true'] {
+  background: var(--c-surface-raised);
+  color: var(--c-text-2);
+  border-color: var(--c-border-strong);
+}
+
+/* ── Textarea (shared notes field) ──────────────────────── */
+
+.sb-textarea {
+  display: block;
+  width: 100%;
+  resize: none;
+  overflow: hidden;
+  font-family: var(--f-editor);
+  font-size: var(--t-md);
+  line-height: 1.85;
+  color: var(--c-text-1);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4) var(--sp-5);
+  caret-color: var(--c-accent);
+  text-align: left;
+  min-height: 140px;
+}
+
+.sb-textarea:focus {
+  outline: none;
+  border-color: var(--c-accent-border);
+}
+
+.sb-textarea::placeholder {
+  color: var(--c-text-placeholder);
+}
+
+@media (max-width: 640px) {
+  .sb-textarea {
+    font-size: 16px;
+    padding: var(--sp-3) var(--sp-4);
+  }
+}
+
+/* ── Title-style input (no border, prominent) ────────────── */
+
+.sb-title-input {
+  display: block;
+  width: 100%;
+  font-family: var(--f-display);
+  font-size: var(--t-xl);
+  font-weight: 400;
+  font-optical-sizing: auto;
+  color: var(--c-text-1);
+  letter-spacing: -0.3px;
+  caret-color: var(--c-accent);
+  text-align: left;
+}
+
+.sb-title-input::placeholder {
+  color: var(--c-text-placeholder);
+}
+
+@media (max-width: 640px) {
+  .sb-title-input {
+    font-size: var(--t-lg);
+  }
+}
+
+/* ── Coming soon stub card ──────────────────────────────── */
+
+.sb-coming-soon {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-5);
+  border: 1px dashed var(--c-border);
+  border-radius: var(--r-lg);
+  color: var(--c-text-3);
+  font-family: var(--f-ui);
+  font-size: var(--t-sm);
+  user-select: none;
+}
+
+.sb-coming-soon svg {
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+/* ── Section label ──────────────────────────────────────── */
+
+.sb-section-label {
+  font-family: var(--f-ui);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-text-3);
+  margin-bottom: var(--sp-3);
+}
+
 /* ── Ghost / dashed action button ───────────────────────── */
 
 .sb-ghost-btn {

@@ -1,85 +1,11 @@
-/* Journal page layout — uses design tokens from tokens.css */
-
-.page {
-  min-height: 100dvh;
-  background: var(--c-bg);
-  padding-bottom: var(--sp-16);
-}
-
-.inner {
-  max-width: var(--journal-max-width);
-  margin: 0 auto;
-  padding: var(--sp-12) var(--sp-8) var(--sp-16);
-}
-
-@media (max-width: 768px) {
-  .page {
-    padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + var(--sp-8));
-  }
-}
-
-@media (max-width: 640px) {
-  .inner {
-    padding: var(--sp-8) var(--sp-5) var(--sp-16);
-  }
-}
-
-/* ── Date header ─────────────────────────────────────────── */
+/* Journal page — layout spacing; page shell and title use components.css classes */
 
 .dateHeader {
   margin-bottom: var(--sp-10);
 }
 
-.weekday {
-  font-family: var(--f-ui);
-  font-size: var(--t-xs);
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--c-text-3);
-  margin-bottom: var(--sp-1);
-}
-
-.dateDisplay {
-  font-family: var(--f-display);
-  font-size: var(--t-3xl);
-  font-weight: 300;
-  font-optical-sizing: auto;
-  color: var(--c-text-2);
-  letter-spacing: -1px;
-  line-height: 1;
-}
-
-@media (max-width: 640px) {
-  .dateDisplay {
-    font-size: var(--t-2xl);
-  }
-}
-
-/* ── Entry title input ───────────────────────────────────── */
-
 .titleInput {
-  display: block;
-  width: 100%;
-  font-family: var(--f-display);
-  font-size: var(--t-xl);
-  font-weight: 400;
-  font-optical-sizing: auto;
-  color: var(--c-text-1);
-  letter-spacing: -0.3px;
   margin-bottom: var(--sp-5);
-  caret-color: var(--c-accent);
-  text-align: left;
-}
-
-.titleInput::placeholder {
-  color: var(--c-text-placeholder);
-}
-
-@media (max-width: 640px) {
-  .titleInput {
-    font-size: var(--t-lg);
-  }
 }
 
 /* ── Editor block ────────────────────────────────────────── */
