@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { settingsApi, spotifyApi } from '../api'
+import { settingsApi } from '../api'
 import { useAuth } from '../hooks/useAuth'
 import SegmentedControl from '../components/SegmentedControl'
 import styles from './Settings.module.css'
