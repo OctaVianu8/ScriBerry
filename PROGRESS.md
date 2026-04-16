@@ -246,6 +246,36 @@ wrangler secret put APPLE_PRIVATE_KEY    # full .p8 file contents
 
 ---
 
+## Session 7 — Settings page (2026-04-16)
+
+### DB schema (`worker/db/schema.sql`)
+- Expanded `settings` table with all columns: theme, accent_color, font_size, reduce_motion, default_page, auto_save_delay, editor_line_height, spell_check, week_start_day, show_empty_days, notifications_enabled, notification_time, notification_sound, gym_weekly_goal, show_streaks, spotify_username, spotify_avatar_url, spotify_auto_fetch, display_name, language
+
+### Worker (`worker/`)
+- `worker/modules/settings/queries.ts` — `getSettings` (with defaults fallback), `upsertSettings` (dynamic partial upsert filtered to allowed columns), `getAllUserData` (export: journal + gym + reading + settings)
+- `worker/modules/settings/index.ts` — routes:
+  - `GET /api/settings` — return current user settings
+  - `PUT /api/settings` — partial update
+  - `GET /api/settings/export` — download all user data as JSON
+
+### Frontend (`src/`)
+- `src/components/SegmentedControl.tsx` + `.module.css` — reusable segmented control component
+- `src/pages/Settings.tsx` — full implementation with 9 sections:
+  - **Profile**: avatar (from Google), display name (editable), email (readonly), sign out (red, destructive)
+  - **Appearance**: theme (Dark/Light/System segmented), accent color (6 preset swatches, live CSS var update), font size (S/M/L), reduce motion toggle
+  - **Writing**: default page, auto-save delay (0.5s/1s/2s), editor line height, spell check toggle
+  - **Calendar**: week start day (Mon/Sun), show empty days in sidebar toggle
+  - **Notifications**: push notifications toggle (triggers Web Push permission), reminder time picker, sound toggle
+  - **Streaks & Goals**: gym weekly goal (number 1-7), show streaks in sidebar toggle
+  - **Spotify**: connect/disconnect, auto-fetch toggle
+  - **Data & Privacy**: export all data (JSON download), clear all data (confirmation dialog with "Type DELETE")
+  - **About**: version, "Made with ☕ during Erasmus"
+- `src/pages/Settings.module.css` — full styles: section cards, toggle switch, color swatches, text/number/time inputs, confirmation dialog, profile row, buttons
+- `src/api/index.ts` — added `settingsApi.exportData()`
+- All settings auto-save immediately on change; accent color applies live via CSS custom properties
+
+---
+
 ## Remaining to build
 
 ### Auth
@@ -286,12 +316,13 @@ wrangler secret put APPLE_PRIVATE_KEY    # full .p8 file contents
 - [ ] PDF export (month)
 
 ### Settings page
-- [ ] All settings sections (account, appearance, notifications, calendar, general, Spotify)
-- [ ] Push notification permission flow
+- [ ] ~~All settings sections (profile, appearance, writing, calendar, notifications, streaks, spotify, data, about)~~ ✅
+- [ ] ~~Push notification permission flow~~ ✅
 
 ### Worker modules
 - [ ] ~~All module route handlers (journal, gym, reading)~~ ✅
-- [ ] Module route handlers (media, push, settings)
+- [ ] ~~Module route handlers (settings)~~ ✅
+- [ ] Module route handlers (media, push)
 - [ ] Auth middleware
 - [ ] Streak calculation logic (`/api/streak`)
 - [ ] ~~Calendar endpoint (`/api/calendar`)~~ ✅

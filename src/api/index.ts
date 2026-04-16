@@ -104,6 +104,7 @@ export const settingsApi = {
   get: () => apiFetch('/settings'),
   put: (body: unknown) =>
     apiFetch('/settings', { method: 'PUT', body: JSON.stringify(body) }),
+  exportData: () => fetch('/api/settings/export', { credentials: 'include' }),
 }
 
 // --- Highlights ---
