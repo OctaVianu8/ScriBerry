@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import type { AuthUser } from '../context/AuthContext'
-import { journalApi } from '../api'
+import { calendarApi } from '../api'
 import styles from './Sidebar.module.css'
 
 // ---------------------------------------------------------------------------
@@ -87,8 +87,10 @@ interface SidebarProps {
 }
 
 interface HistoryDay {
-  date: string        // YYYY-MM-DD
-  hasJournal: boolean
+  date: string
+  journal: boolean
+  gym: boolean
+  reading: boolean
 }
 
 // ---------------------------------------------------------------------------
@@ -100,14 +102,9 @@ function todayISO() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-function lastNDays(n: number): string[] {
-  const days: string[] = []
-  for (let i = 0; i < n; i++) {
-    const d = new Date()
-    d.setDate(d.getDate() - i)
-    days.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
-  }
-  return days
+function currentMonthISO() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
 }
 
 function shortDate(iso: string): string {
@@ -129,20 +126,20 @@ export default function Sidebar({ expanded, isMobile, onToggle, onClose, user }:
   const navigate = useNavigate()
   const [history, setHistory] = useState<HistoryDay[]>([])
   const today = todayISO()
-  const days = lastNDays(7)
 
-  // Fetch journal history to populate dots
+  // Fetch calendar data to populate history with activity dots
   useEffect(() => {
-    if (!expanded) return // don't fetch if collapsed/closed
-    journalApi.history()
+    if (!expanded) return
+    calendarApi.getMonth(currentMonthISO())
       .then(r => r.ok ? r.json() : [])
-      .then((data: { date: string }[]) => {
-        const dateSet = new Set(data.map(d => d.date))
-        setHistory(days.map(d => ({ date: d, hasJournal: dateSet.has(d) })))
+      .then((data: { date: string; journal: boolean; gym: boolean; reading: boolean }[]) => {
+        // Only keep days that have at least one activity, sorted descending
+        const withContent = data
+          .filter(d => d.journal || d.gym || d.reading)
+          .sort((a, b) => b.date.localeCompare(a.date))
+        setHistory(withContent)
       })
-      .catch(() => {
-        setHistory(days.map(d => ({ date: d, hasJournal: false })))
-      })
+      .catch(() => setHistory([]))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expanded])
 
@@ -184,8 +181,8 @@ export default function Sidebar({ expanded, isMobile, onToggle, onClose, user }:
           <SideNavItem to="/group"          icon={icons.group}      label="Group"      expanded={expanded} disabled tag="Soon" />
         </nav>
 
-        {/* History — only when expanded */}
-        {expanded && (
+        {/* History — only when expanded, only days with content */}
+        {expanded && history.length > 0 && (
           <>
             <div className={styles.divider} />
             <div className={styles.historySection}>
@@ -203,11 +200,9 @@ export default function Sidebar({ expanded, isMobile, onToggle, onClose, user }:
                     {day.date === today ? 'Today' : shortDate(day.date)}
                   </span>
                   <span className={styles.historyDots}>
-                    {/* Journal dot */}
-                    <span className={styles.dot} data-filled={String(day.hasJournal)} />
-                    {/* Gym + Reading — always gray for now */}
-                    <span className={styles.dot} />
-                    <span className={styles.dot} />
+                    {day.journal && <span className={styles.dot} data-color="journal" />}
+                    {day.gym && <span className={styles.dot} data-color="gym" />}
+                    {day.reading && <span className={styles.dot} data-color="reading" />}
                   </span>
                 </div>
               ))}

@@ -255,9 +255,9 @@
   background: var(--c-surface-raised);
 }
 
-.dot[data-filled='true'] {
-  background: var(--c-accent);
-}
+.dot[data-color='journal'] { background: var(--c-accent); }
+.dot[data-color='gym']     { background: var(--c-success); }
+.dot[data-color='reading'] { background: #e8973f; }
 
 /* ── Streak counters ─────────────────────────────────────── */
 

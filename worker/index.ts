@@ -2,6 +2,7 @@ import { handleAuth, getAuthenticatedUserId } from './modules/auth'
 import { handleJournal } from './modules/journal'
 import { handleGym } from './modules/gym'
 import { handleReading } from './modules/reading'
+import { handleCalendar } from './modules/calendar'
 import { handleMedia } from './modules/media'
 import { handlePush } from './modules/push'
 import { handleSettings } from './modules/settings'
@@ -49,6 +50,7 @@ export default {
       if (pathname.startsWith('/api/journal')) return handleJournal(request, env, userId)
       if (pathname.startsWith('/api/gym')) return handleGym(request, env, userId)
       if (pathname.startsWith('/api/reading')) return handleReading(request, env, userId)
+      if (pathname.startsWith('/api/calendar')) return handleCalendar(request, env, userId)
       if (pathname.startsWith('/api/media')) return handleMedia(request, env, userId)
       if (pathname.startsWith('/api/audio')) return handleMedia(request, env, userId)
       if (pathname.startsWith('/api/push')) return handlePush(request, env, userId)

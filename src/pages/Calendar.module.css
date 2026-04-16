@@ -1,0 +1,238 @@
+/* Calendar page */
+
+.page {
+  min-height: 100dvh;
+  background: var(--c-bg);
+  padding-bottom: var(--sp-16);
+}
+
+.inner {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--sp-12) var(--sp-8) var(--sp-16);
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + var(--sp-8));
+  }
+}
+
+@media (max-width: 640px) {
+  .inner {
+    padding: var(--sp-8) var(--sp-3) var(--sp-16);
+  }
+}
+
+/* ── Month navigation header ────────────────────────────── */
+
+.monthHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-6);
+  margin-bottom: var(--sp-8);
+}
+
+.monthLabel {
+  font-family: var(--f-display);
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-optical-sizing: auto;
+  color: var(--c-text-1);
+  letter-spacing: -0.5px;
+  min-width: 200px;
+  text-align: center;
+  user-select: none;
+}
+
+.navArrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-md);
+  color: var(--c-text-3);
+  cursor: pointer;
+  transition: color var(--ease-fast), background var(--ease-fast);
+  flex-shrink: 0;
+}
+
+.navArrow:hover {
+  color: var(--c-text-1);
+  background: var(--c-surface-2);
+}
+
+/* ── Calendar grid ──────────────────────────────────────── */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+}
+
+.dayLabel {
+  text-align: center;
+  font-family: var(--f-ui);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-text-3);
+  padding-bottom: var(--sp-3);
+}
+
+.dayLabel[data-weekend='true'] {
+  color: var(--c-text-placeholder);
+}
+
+/* ── Day cell ───────────────────────────────────────────── */
+
+.cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--sp-2) 0 var(--sp-3);
+  min-height: 56px;
+  border-radius: var(--r-md);
+  transition: background var(--ease-fast);
+  user-select: none;
+}
+
+.cell[data-interactive='true'] {
+  cursor: pointer;
+}
+
+.cell[data-interactive='true']:hover {
+  background: var(--c-surface);
+}
+
+.cell[data-weekend='true'] {
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.cell[data-outside='true'] {
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.dayNumber {
+  font-family: var(--f-ui);
+  font-size: var(--t-sm);
+  font-weight: 400;
+  color: var(--c-text-3);
+  line-height: 1;
+  margin-bottom: var(--sp-1);
+}
+
+.cell[data-has-content='true'] .dayNumber {
+  color: var(--c-text-1);
+  font-weight: 500;
+}
+
+.cell[data-today='true'] .dayNumber {
+  color: var(--c-accent);
+  font-weight: 600;
+}
+
+.cell[data-today='true'] {
+  border: 1px solid var(--c-accent-border);
+}
+
+/* Activity dots */
+
+.dots {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  height: 6px;
+}
+
+.actDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.actDot[data-type='journal'] { background: var(--c-accent); }
+.actDot[data-type='gym']     { background: var(--c-success); }
+.actDot[data-type='reading'] { background: #e8973f; }
+
+/* ── Day popover ────────────────────────────────────────── */
+
+.popoverBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+}
+
+.popover {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  background: var(--c-surface-raised);
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--r-lg);
+  padding: var(--sp-2);
+  min-width: 140px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.popoverLink {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-md);
+  font-family: var(--f-ui);
+  font-size: var(--t-sm);
+  color: var(--c-text-2);
+  cursor: pointer;
+  transition: background var(--ease-fast), color var(--ease-fast);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.popoverLink:hover {
+  background: var(--c-surface-overlay);
+  color: var(--c-text-1);
+}
+
+.popoverDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Mobile popover: bottom sheet ───────────────────────── */
+
+@media (max-width: 640px) {
+  .popoverBackdrop {
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  .popover {
+    position: fixed;
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: none;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    min-width: auto;
+    padding: var(--sp-4) var(--sp-4) calc(var(--sp-4) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .popoverLink {
+    min-height: 44px;
+    font-size: var(--t-base);
+  }
+}

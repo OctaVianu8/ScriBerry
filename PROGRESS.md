@@ -217,6 +217,35 @@ wrangler secret put APPLE_PRIVATE_KEY    # full .p8 file contents
 
 ---
 
+## Session 6 — Calendar page + Sidebar history (2026-04-16)
+
+### Worker (`worker/`)
+- `worker/modules/calendar/queries.ts` — `getMonthActivity`: single D1 query across journal_entries, gym_sessions, reading_logs using UNION + LEFT JOINs, returns per-day boolean flags
+- `worker/modules/calendar/index.ts` — `GET /api/calendar?month=YYYY-MM` route handler
+- `worker/index.ts` — added calendar route dispatch
+
+### Frontend (`src/`)
+- `src/pages/Calendar.tsx` — full implementation:
+  - Month/year header with chevron navigation
+  - 7-column Mon–Sun grid with padding days from prev/next months
+  - Activity dots per day: blue (journal), green (gym), orange (reading)
+  - Today highlighted with accent border
+  - Days with content: bright, clickable; days without: muted, not clickable
+  - Outside-month and future days: very muted, non-interactive
+  - Weekends: subtle background difference
+  - Day click opens popover with links to that day's Journal/Gym/Reading (only activities with entries)
+  - Mobile: popover renders as bottom sheet with backdrop
+  - Tap outside closes popover
+- `src/pages/Calendar.module.css` — full styles: grid layout, day cells, dots, popover, mobile bottom sheet
+- `src/components/Sidebar.tsx` — history section rewritten:
+  - Uses `/api/calendar` endpoint instead of journal-only history
+  - Only shows days that have at least one entry (no empty days)
+  - Colored dots per activity (blue=journal, green=gym, orange=reading)
+  - Days with no content are completely hidden
+- `src/components/Sidebar.module.css` — updated dot styles with `data-color` variants
+
+---
+
 ## Remaining to build
 
 ### Auth
@@ -246,9 +275,9 @@ wrangler secret put APPLE_PRIVATE_KEY    # full .p8 file contents
 - [ ] ~~Book title field + notes textarea + auto-save~~ ✅
 
 ### Calendar page
-- [ ] CalendarGrid component with activity dots
-- [ ] Month navigation
-- [ ] Day click → sidebar with links
+- [ ] ~~CalendarGrid component with activity dots~~ ✅
+- [ ] ~~Month navigation~~ ✅
+- [ ] ~~Day click → popover with links~~ ✅
 - [ ] PDF export (week)
 
 ### Highlights page
@@ -265,7 +294,7 @@ wrangler secret put APPLE_PRIVATE_KEY    # full .p8 file contents
 - [ ] Module route handlers (media, push, settings)
 - [ ] Auth middleware
 - [ ] Streak calculation logic (`/api/streak`)
-- [ ] Calendar endpoint (`/api/calendar`)
+- [ ] ~~Calendar endpoint (`/api/calendar`)~~ ✅
 - [ ] Highlights endpoint (`/api/highlights`)
 - [ ] Spotify OAuth + top-track endpoints
 - [ ] R2 signed URL generation
@@ -273,7 +302,7 @@ wrangler secret put APPLE_PRIVATE_KEY    # full .p8 file contents
 - [ ] Cron: push notification sender
 
 ### Sidebar
-- [ ] History list (last 30 days with per-day content indicators)
+- [ ] ~~History list (days with content + colored activity dots)~~ ✅
 - [ ] User avatar + name
 - [ ] Streak counters (journal / gym / reading)
 - [ ] Mobile collapse (hamburger / bottom nav)
