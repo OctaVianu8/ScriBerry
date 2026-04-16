@@ -6,6 +6,8 @@ import { useAutoSave } from '../hooks/useAutoSave'
 import RichEditor from '../components/RichEditor'
 import ImageUploader from '../components/ImageUploader'
 import AudioRecorder from '../components/AudioRecorder'
+import DateHeader, { todayISO } from '../components/DateHeader'
+import SaveIndicator from '../components/SaveIndicator'
 import styles from './Journal.module.css'
 
 // ---------------------------------------------------------------------------
@@ -25,48 +27,6 @@ interface JournalImage {
   id: string
   r2_url: string
   caption: string | null
-}
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function todayISO() {
-  const now = new Date()
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
-}
-
-function formatDate(iso: string) {
-  const [y, m, d] = iso.split('-').map(Number)
-  const date = new Date(y, m - 1, d)
-  return {
-    weekday: date.toLocaleDateString('en-US', { weekday: 'long' }),
-    day: String(d),
-    monthYear: date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Sub-components
-// ---------------------------------------------------------------------------
-
-function SavedIndicator({ status }: { status: string }) {
-  const visible = status !== 'idle'
-  const text =
-    status === 'saving' ? 'saving…'
-    : status === 'saved' ? 'saved ✓'
-    : status === 'error' ? 'error'
-    : ''
-
-  return (
-    <div
-      className="sb-saved"
-      data-visible={String(visible)}
-      data-state={status}
-    >
-      {text}
-    </div>
-  )
 }
 
 function SongField({
@@ -135,7 +95,6 @@ function HighlightField({ value, onChange }: { value: string; onChange: (v: stri
 export default function Journal() {
   const { date: dateParam } = useParams<{ date?: string }>()
   const dateStr = !dateParam || dateParam === 'today' ? todayISO() : dateParam
-  const { weekday, day, monthYear } = formatDate(dateStr)
 
   const [loading, setLoading] = useState(true)
   const [title, setTitle] = useState('')
@@ -197,19 +156,12 @@ export default function Journal() {
   }
 
   return (
-    <div className={styles.page}>
-      <div className={styles.inner}>
-        <SavedIndicator status={status} />
+    <div className="sb-page">
+      <div className="sb-page-inner">
+        <SaveIndicator status={status} />
 
         {/* Date header */}
-        <header className={styles.dateHeader}>
-          <div className={styles.weekday}>{weekday}</div>
-          <div className={styles.dateDisplay}>
-            <span style={{ fontWeight: 600, color: 'var(--c-text-1)' }}>{day}</span>
-            {' '}
-            <span style={{ fontStyle: 'italic' }}>{monthYear}</span>
-          </div>
-        </header>
+        <DateHeader dateStr={dateStr} className={styles.dateHeader} />
 
         {/* Song of the day */}
         <SongField
@@ -225,7 +177,7 @@ export default function Journal() {
           value={title}
           onChange={e => handleTitle(e.target.value)}
           placeholder="Untitled"
-          className={styles.titleInput}
+          className={`sb-title-input ${styles.titleInput}`}
         />
 
         {/* Rich text editor */}

@@ -40,6 +40,7 @@ export const gymApi = {
   get: (date: string) => apiFetch(`/gym/${date}`),
   put: (date: string, body: unknown) =>
     apiFetch(`/gym/${date}`, { method: 'PUT', body: JSON.stringify(body) }),
+  history: () => apiFetch('/gym/history'),
 }
 
 // --- Reading ---
@@ -48,6 +49,7 @@ export const readingApi = {
   get: (date: string) => apiFetch(`/reading/${date}`),
   put: (date: string, body: unknown) =>
     apiFetch(`/reading/${date}`, { method: 'PUT', body: JSON.stringify(body) }),
+  history: () => apiFetch('/reading/history'),
 }
 
 // --- Calendar ---

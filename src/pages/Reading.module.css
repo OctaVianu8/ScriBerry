@@ -1,0 +1,9 @@
+/* Reading page — layout spacing only; all visual styles use components.css classes */
+
+.dateHeader {
+  margin-bottom: var(--sp-10);
+}
+
+.section {
+  margin-bottom: var(--sp-6);
+}

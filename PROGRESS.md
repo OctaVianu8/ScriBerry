@@ -172,6 +172,51 @@ wrangler secret put APPLE_PRIVATE_KEY    # full .p8 file contents
 
 ---
 
+## Session 5 — Gym & Reading pages (2026-04-16)
+
+### Design system extractions (`src/styles/components.css`)
+- Extracted `.sb-page` / `.sb-page-inner` — shared page shell (replaces per-page `.page`/`.inner`)
+- Extracted `.sb-date-weekday` / `.sb-date-display` — shared date header styles
+- Added `.sb-pill-group` / `.sb-pill` — single-select pill button row with `data-selected`, `data-muted` variants
+- Added `.sb-textarea` — auto-grow dark textarea with focus ring
+- Added `.sb-title-input` — borderless prominent title-style input
+- Added `.sb-coming-soon` — dashed stub card with lock icon
+- Added `.sb-section-label` — uppercase muted section heading
+
+### Shared components
+- `src/components/DateHeader.tsx` — reusable date header (weekday + day/month/year), exports `todayISO` and `formatDate`
+- `src/components/SaveIndicator.tsx` — reusable saved/saving/error indicator
+- `src/hooks/useAutoGrow.ts` — auto-resize textarea hook
+
+### Backend (`worker/`)
+- `worker/modules/gym/queries.ts` — `getSessionByDate`, `upsertSession` (ON CONFLICT upsert), `getHistory` (last 90 days with session_type)
+- `worker/modules/gym/index.ts` — `GET /api/gym/:date`, `PUT /api/gym/:date`, `GET /api/gym/history`
+- `worker/modules/reading/queries.ts` — `getLogByDate`, `upsertLog` (ON CONFLICT upsert), `getHistory` (last 90 days with book_title)
+- `worker/modules/reading/index.ts` — `GET /api/reading/:date`, `PUT /api/reading/:date`, `GET /api/reading/history`
+
+### Frontend (`src/`)
+- `src/pages/Gym.tsx` — full implementation:
+  - Date header (shared DateHeader component)
+  - Session type pill selector: Push / Pull / Legs / Arms / Cardio / Rest (Rest is visually muted)
+  - Notes textarea with auto-grow
+  - Auto-save debounced 1000ms with SaveIndicator
+  - Coming soon stub: weights & reps tracker (lock icon + label)
+  - Loading skeleton
+- `src/pages/Reading.tsx` — full implementation:
+  - Date header (shared DateHeader component)
+  - Book title field (prominent, borderless, sb-title-input)
+  - Notes textarea with auto-grow
+  - Auto-save debounced 1000ms with SaveIndicator
+  - Loading skeleton
+- `src/api/index.ts` — added `gymApi.history()`, `readingApi.history()`
+
+### Journal page refactor
+- Migrated to shared `sb-page`, `sb-page-inner`, `sb-title-input` classes
+- Replaced inline SavedIndicator/formatDate/todayISO with shared components
+- Removed duplicated CSS from `Journal.module.css` (date header, page shell, title input styles)
+
+---
+
 ## Remaining to build
 
 ### Auth
@@ -192,12 +237,13 @@ wrangler secret put APPLE_PRIVATE_KEY    # full .p8 file contents
 - [ ] Spotify auto-fetch for song of the day (future)
 
 ### Gym page
-- [ ] Session type selector (pill buttons)
-- [ ] Notes textarea + auto-save
-- [ ] UI stub: weights & reps tracker section
+- [ ] ~~Session type selector (pill buttons)~~ ✅
+- [ ] ~~Notes textarea + auto-save~~ ✅
+- [ ] ~~UI stub: weights & reps tracker section~~ ✅
+- [ ] Weights & reps tracker (actual implementation — future)
 
 ### Reading page
-- [ ] Book title field + notes textarea + auto-save
+- [ ] ~~Book title field + notes textarea + auto-save~~ ✅
 
 ### Calendar page
 - [ ] CalendarGrid component with activity dots
@@ -215,7 +261,8 @@ wrangler secret put APPLE_PRIVATE_KEY    # full .p8 file contents
 - [ ] Push notification permission flow
 
 ### Worker modules
-- [ ] All module route handlers (journal, gym, reading, media, push, settings)
+- [ ] ~~All module route handlers (journal, gym, reading)~~ ✅
+- [ ] Module route handlers (media, push, settings)
 - [ ] Auth middleware
 - [ ] Streak calculation logic (`/api/streak`)
 - [ ] Calendar endpoint (`/api/calendar`)
