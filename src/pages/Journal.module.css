@@ -20,6 +20,60 @@
   margin-top: var(--sp-2);
 }
 
+/* ── Spotify song pill ───────────────────────────────────── */
+
+.spotifySong {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  background: rgba(29, 185, 84, 0.08);
+  border: 1px solid rgba(29, 185, 84, 0.2);
+  border-radius: var(--r-md);
+  margin-bottom: var(--sp-3);
+}
+
+.spotifyIcon {
+  flex-shrink: 0;
+}
+
+.spotifySongText {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--f-ui);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--c-text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spotifySongArtist {
+  color: var(--c-text-3);
+  font-weight: 400;
+}
+
+.spotifyBtn {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--c-text-3);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: color var(--ease-fast), background var(--ease-fast);
+}
+
+.spotifyBtn:hover {
+  color: var(--c-text-1);
+  background: var(--c-surface-2);
+}
+
 /* ── Bottom actions row ──────────────────────────────────── */
 
 .actions {

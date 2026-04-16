@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { settingsApi } from '../api'
+import { settingsApi, spotifyApi } from '../api'
 import { useAuth } from '../hooks/useAuth'
 import SegmentedControl from '../components/SegmentedControl'
 import styles from './Settings.module.css'
@@ -78,6 +78,22 @@ export default function Settings() {
         setLoading(false)
       })
       .catch(() => setLoading(false))
+
+    // Handle Spotify OAuth redirect params
+    const params = new URLSearchParams(window.location.search)
+    const spotifyStatus = params.get('spotify')
+    if (spotifyStatus === 'connected') {
+      // Refresh settings to pick up newly connected Spotify account
+      settingsApi.get()
+        .then(r => r.ok ? r.json() : null)
+        .then((data: UserSettings | null) => {
+          if (data) setSettings(data)
+        })
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname)
+    } else if (spotifyStatus) {
+      window.history.replaceState({}, '', window.location.pathname)
+    }
   }, [])
 
   const update = useCallback((patch: Partial<UserSettings>) => {
@@ -342,7 +358,7 @@ export default function Settings() {
             <>
               <div className={styles.row}>
                 <span className={styles.rowLabel}>Connected as {settings.spotify_username}</span>
-                <button type="button" className={styles.btn} onClick={() => update({ spotify_username: null, spotify_avatar_url: null })}>
+                <button type="button" className={styles.btn} onClick={() => { window.location.href = '/api/spotify/disconnect' }}>
                   Disconnect
                 </button>
               </div>
@@ -354,7 +370,7 @@ export default function Settings() {
           ) : (
             <div className={styles.row}>
               <span className={styles.rowLabel}>Connect your Spotify account</span>
-              <button type="button" className={styles.btn} onClick={() => { /* TODO: spotify OAuth */ }}>
+              <button type="button" className={styles.btn} onClick={() => { window.location.href = '/api/spotify/auth' }}>
                 Connect
               </button>
             </div>

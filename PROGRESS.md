@@ -276,6 +276,36 @@ wrangler secret put APPLE_PRIVATE_KEY    # full .p8 file contents
 
 ---
 
+## Session 8 — Spotify OAuth + song of the day auto-fetch (2026-04-16)
+
+### Worker (`worker/`)
+- `worker/modules/spotify/index.ts` — full Spotify integration module:
+  - `GET /api/spotify/auth` — initiates OAuth flow with state cookie, redirects to Spotify
+  - `GET /api/spotify/callback` — exchanges code for tokens, saves to DB, fetches profile (username + avatar), redirects to `/settings?spotify=connected`
+  - `GET /api/spotify/disconnect` — clears all Spotify fields in settings, redirects to `/settings?spotify=disconnected`
+  - `GET /api/spotify/me` — returns current Spotify profile (username, avatar)
+  - `GET /api/spotify/top-track?date=YYYY-MM-DD` — fetches recently-played tracks, filters by date, returns most frequently played track
+  - Token refresh helper with 60s buffer, transparent token rotation
+- `worker/index.ts` — added Spotify route dispatch + `SPOTIFY_CLIENT_ID`/`SPOTIFY_CLIENT_SECRET` to Env interface
+
+### Config
+- `wrangler.toml` — added `SPOTIFY_CLIENT_ID` var and `SPOTIFY_CLIENT_SECRET` secret comment
+
+### Frontend (`src/`)
+- `src/api/index.ts` — added `spotifyApi.me()` and `spotifyApi.disconnect()`
+- `src/pages/Settings.tsx` — Spotify section now functional:
+  - Connect button redirects to `/api/spotify/auth`
+  - Disconnect button redirects to `/api/spotify/disconnect`
+  - Detects `?spotify=connected` URL param and refreshes settings
+- `src/pages/Journal.tsx` — Spotify auto-fetch:
+  - On entry load, checks if `spotify_auto_fetch` enabled + Spotify connected
+  - If no song exists, fetches top track from Spotify API
+  - Shows Spotify-branded pill (green border, Spotify logo, song + artist)
+  - Refresh button re-fetches from Spotify, Edit button switches to manual input
+- `src/pages/Journal.module.css` — Spotify song pill styles
+
+---
+
 ## Remaining to build
 
 ### Auth
@@ -293,7 +323,7 @@ wrangler secret put APPLE_PRIVATE_KEY    # full .p8 file contents
 - [ ] ~~Audio record → Workers AI transcription~~ ✅
 - [ ] ~~Highlight field~~ ✅
 - [ ] ~~Auto-save with "Saved" indicator~~ ✅
-- [ ] Spotify auto-fetch for song of the day (future)
+- [ ] ~~Spotify auto-fetch for song of the day~~ ✅
 
 ### Gym page
 - [ ] ~~Session type selector (pill buttons)~~ ✅
@@ -327,7 +357,7 @@ wrangler secret put APPLE_PRIVATE_KEY    # full .p8 file contents
 - [ ] Streak calculation logic (`/api/streak`)
 - [ ] ~~Calendar endpoint (`/api/calendar`)~~ ✅
 - [ ] Highlights endpoint (`/api/highlights`)
-- [ ] Spotify OAuth + top-track endpoints
+- [ ] ~~Spotify OAuth + top-track endpoints~~ ✅
 - [ ] R2 signed URL generation
 - [ ] Workers AI Whisper transcription
 - [ ] Cron: push notification sender

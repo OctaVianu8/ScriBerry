@@ -123,7 +123,8 @@ export const streakApi = {
 
 export const spotifyApi = {
   getTopTrack: (date: string) => apiFetch(`/spotify/top-track?date=${date}`),
-  startAuth: () => apiFetch('/spotify/auth'),
+  me: () => apiFetch('/spotify/me'),
+  disconnect: () => fetch('/api/spotify/disconnect', { credentials: 'include' }),
 }
 
 // --- Auth ---

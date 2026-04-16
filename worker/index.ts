@@ -6,6 +6,7 @@ import { handleCalendar } from './modules/calendar'
 import { handleMedia } from './modules/media'
 import { handlePush } from './modules/push'
 import { handleSettings } from './modules/settings'
+import { handleSpotify } from './modules/spotify'
 import { sendScheduledNotifications } from './cron/notifications'
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types'
 
@@ -27,6 +28,8 @@ export interface Env {
   APPLE_TEAM_ID: string
   APPLE_KEY_ID: string
   APPLE_PRIVATE_KEY: string
+  SPOTIFY_CLIENT_ID: string
+  SPOTIFY_CLIENT_SECRET: string
 }
 
 const json401 = () =>
@@ -54,6 +57,7 @@ export default {
       if (pathname.startsWith('/api/media')) return handleMedia(request, env, userId)
       if (pathname.startsWith('/api/audio')) return handleMedia(request, env, userId)
       if (pathname.startsWith('/api/push')) return handlePush(request, env, userId)
+      if (pathname.startsWith('/api/spotify')) return handleSpotify(request, env, userId)
       if (pathname.startsWith('/api/settings')) return handleSettings(request, env, userId)
 
       return new Response('Not found', { status: 404 })
